@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8" />
+    <title>
+        视频测试
+    </title>
+    <script src="Video.js"></script>
+    <script>
+      
+
+        window.onload = function () {
+            var video1 = new Video("test.mp4", 480, 330, document.getElementById("video_div"), screenshot);
+            video1.load();
+            var video11 = new Video("test.mp4", 480, 330, document.getElementById("video_div"), screenshot);
+            video11.load();
+            var video111 = new Video("test.mp4", 480, 330, document.getElementById("video_div"), screenshot);
+            video111.load();
+            var video1111 = new Video("test.mp4", 480, 330, document.getElementById("video_div"), screenshot);
+            video1111.load();
+            var pic1=new Pic("a.jpg",480,330,document.getElementById("pic_div"));
+            pic1.load();
+            var pic11=new Pic("a.jpg",480,330,document.getElementById("pic_div"));
+            pic11.load();
+            var pic111=new Pic("a.jpg",480,330,document.getElementById("pic_div"));
+            pic111.load();
+        }
+        function screenshot(blob) {
+            console.log(blob);
+        }
+    </script>
+</head>
+
+<body>
+    <div id="video_div" style="width: 1000px;height: 700px;border: 3px solid #AAAAFF;padding: 0;">
+
+    </div>
+    <div id="pic_div" style="width: 1000px;height: 700px;border: 3px solid #AAAAFF;padding: 0;">
+
+    </div>
+</body>
+
+</html>
