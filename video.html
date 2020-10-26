@@ -9,16 +9,24 @@
     <script src="Video.js"></script>
     <script>
       
-
+var video_list=new Array();
         window.onload = function () {
-            var video1 = new Video("test.mp4", 480, 330, document.getElementById("video_div"), screenshot);
+            video_list.length=0;
+         
+            var video1 = new Video("test.mp4", 480, 315, document.getElementById("video_div"), screenshot,"the_video1",25,video_list);
             video1.load();
-            var video11 = new Video("test.mp4", 480, 330, document.getElementById("video_div"), screenshot);
+
+           
+            var video11 = new Video("test.mp4", 480, 315, document.getElementById("video_div"), screenshot,"the_video11",25,video_list);
             video11.load();
-            var video111 = new Video("test.mp4", 480, 330, document.getElementById("video_div"), screenshot);
+            var video111 = new Video("test.mp4", 480, 315, document.getElementById("video_div"), screenshot,"the_video111",25,video_list);
             video111.load();
-            var video1111 = new Video("test.mp4", 480, 330, document.getElementById("video_div"), screenshot);
+            var video1111 = new Video("test.mp4", 480, 315, document.getElementById("video_div"), screenshot,"the_video1111",25,video_list);
             video1111.load();
+            video_list.push(video1);
+            video_list.push(video11);
+            video_list.push(video111);
+            video_list.push(video1111);
             var pic1=new Pic("a.jpg",480,330,document.getElementById("pic_div"));
             pic1.load();
             var pic11=new Pic("a.jpg",480,330,document.getElementById("pic_div"));

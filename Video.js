@@ -6,11 +6,11 @@
  * @param {Element} father_div 父DIV
  * @param {Function} screenshot_callback 截图按钮回调（参数是图片的blob）
  */
-function Video(src, width, height, father_div, screenshot_callback, video_name = "Video", frame_rate = 25) {
+function Video(src, width, height, father_div, screenshot_callback, video_name = "Video", frame_rate = 25, video_list = null) {
 
     this.src = src;//视频mp4链接地址
-
-
+    var this_src = src;//视频mp4链接地址
+    var video_list = video_list;
     var width = width;//宽度
     var height = height;//高度
     var normal_width = width;//记录正常大小宽度
@@ -38,15 +38,17 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
     var size = "min";//窗口大小标志
 
     var video_time;//视频总时长
+
+
     //加载控制条
     var control_load = function () {
         pause_button.style.cssText = "width:25px;height:25px;border:5px solid #888888;border-radius:25px;background-color: transparent;" +
             "padding:0;margin: 3px 3px;float:left; cursor:pointer;box-sizing: content-box;";
-        
+
         pause_button_triangle.style.cssText = "width: 0;height: 0;border: 10px solid transparent;margin:3px 6px 3px 9px;" +
             "border-left-color: #888888;border-right: none;border-top-color: transparent;border-bottom-color: transparent;box-sizing: content-box;";
         pause_button.appendChild(pause_button_triangle);
-       
+
         pause_button_Line.style.cssText = "width: 3px;height: 15px;border: 5px solid #888888;margin:5px 6px 5px 6px;box-sizing: content-box;" +
             "border-top: none;border-bottom: none;";
         pause_button_Line.style.display = "none";
@@ -55,14 +57,31 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         pause_button.onclick = function () {
             var video_play_status = !Video_Obj.paused;
             if (video_play_status) {
-                Video_Obj.pause();
-                pause_button_triangle.style.display = "";
-                pause_button_Line.style.display = "none";
-
+                if (!select_obj.checked) {
+                    Video_Obj.pause();
+                    pause_button_triangle.style.display = "";
+                    pause_button_Line.style.display = "none";
+                }
+                if (video_list != null && select_obj.checked) {
+                    video_list.forEach(video => {
+                        if (video.select_checked()) {
+                            video.pause();
+                        }
+                    });
+                }
             } else {
-                Video_Obj.play();
-                pause_button_Line.style.display = "";
-                pause_button_triangle.style.display = "none";
+                if (!select_obj.checked) {
+                    Video_Obj.play();
+                    pause_button_Line.style.display = "";
+                    pause_button_triangle.style.display = "none";
+                }
+                if (video_list != null && select_obj.checked) {
+                    video_list.forEach(video => {
+                        if (video.select_checked()) {
+                            video.play();
+                        }
+                    });
+                }
             }
         }
         Controls_div.appendChild(pause_button);
@@ -83,11 +102,24 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         var time_text_div = document.createElement("div");
         time_text_div.style.cssText = "font-size:10px;float:left;";
 
+        /**
+         * 进度条按下
+         * @param {*} e 
+         */
         control_range.onmousedown = function (e) {
             //进度条按下按钮 
-            var length = e.offsetX;
-            var percent = video_time / this.offsetWidth;
-            Video_Obj.currentTime = length * percent;
+            if (!select_obj.checked) {
+                var length = e.offsetX;
+                var percent = video_time / this.offsetWidth;
+                Video_Obj.currentTime = length * percent;
+            }
+            if (video_list != null && select_obj.checked) {
+                video_list.forEach(video => {
+                    if (video.select_checked()) {
+                        video.SetVideoCurrentTime(length / this.offsetWidth);
+                    }
+                });
+            }
         }
         //视频加载就绪时
         Video_Obj.addEventListener("canplay", function () {
@@ -115,9 +147,19 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         //显示视频播放速度       
         speed_div.style.cssText = "font-size:10px;float:right;margin:0px 0px 0px 0px;cursor:pointer;";
         speed_div.innerText = Video_Obj.playbackRate + "倍";
+        //视频播放速度调整为1
         speed_div.onclick = function () {
-            Video_Obj.playbackRate = 1;
-            speed_div.innerText = Video_Obj.playbackRate + "倍";
+            if (!select_obj.checked) {
+                Video_Obj.playbackRate = 1;
+                speed_div.innerText = Video_Obj.playbackRate + "倍";
+            }
+            if (video_list != null && select_obj.checked) {
+                video_list.forEach(video => {
+                    if (video.select_checked()) {
+                        video.speed_normal();
+                    }
+                });
+            }
         }
         range_div.appendChild(speed_div);
         Controls_div.appendChild(range_div);
@@ -144,9 +186,17 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         }
         //减速按钮点击事件
         speed_down_btn.onclick = function () {
-            if (Video_Obj.playbackRate > 0.075) {
-                Video_Obj.playbackRate /= 2;
-                speed_div.innerText = Video_Obj.playbackRate + "倍";
+            if (!select_obj.checked)
+                if (Video_Obj.playbackRate > 0.075) {
+                    Video_Obj.playbackRate /= 2;
+                    speed_div.innerText = Video_Obj.playbackRate + "倍";
+                }
+            if (video_list != null && select_obj.checked) {
+                video_list.forEach(video => {
+                    if (video.select_checked()) {
+                        video.speed_down();
+                    }
+                });
             }
         }
         Controls_div.appendChild(speed_down_btn);
@@ -173,9 +223,17 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         }
         //加速按钮点击事件
         speed_up_btn.onclick = function () {
-            if (Video_Obj.playbackRate < 16) {
-                Video_Obj.playbackRate *= 2;
-                speed_div.innerText = Video_Obj.playbackRate + "倍";
+            if (!select_obj.checked)
+                if (Video_Obj.playbackRate < 16) {
+                    Video_Obj.playbackRate *= 2;
+                    speed_div.innerText = Video_Obj.playbackRate + "倍";
+                }
+            if (video_list != null && select_obj.checked) {
+                video_list.forEach(video => {
+                    if (video.select_checked()) {
+                        video.speed_up();
+                    }
+                });
             }
         }
         Controls_div.appendChild(speed_up_btn);
@@ -209,14 +267,23 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         }
         //截图按钮单击
         cut_jpg_btn.onclick = function () {
-            pri_cut_pic();
+            if (!select_obj.checked)
+                pri_cut_pic();
+            if (video_list != null && select_obj.checked) {
+                video_list.forEach(video => {
+                    if (video.select_checked()) {
+                        video.Cut_Pic();
+                    }
+                });
+            }
         }
 
         //复选框
         select_obj.type = "checkbox";
-        select_obj.checked = "checked";
+        select_obj.checked = true;
         select_obj.style.cssText = "float:left;margin:13px 0 12px 0;width:15px;";
         Controls_div.appendChild(select_obj);
+
     }
 
     //加载视频内控制按钮
@@ -262,7 +329,15 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         }
         //鼠标点击下载按钮
         download_btn.onclick = function (e) {
-           pri_download();
+            isFinite(!select_obj.checked)
+            pri_download();
+            if (video_list != null && select_obj.checked) {
+                video_list.forEach(video => {
+                    if (video.select_checked()) {
+                        video.download();
+                    }
+                });
+            }
         }
         this_div.appendChild(download_btn);
 
@@ -323,8 +398,16 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         }
         //上一帧按钮鼠标单击
         before_frame_btn.onclick = function (e) {
-            if (Video_Obj.currentTime > 0)
-                Video_Obj.currentTime -= 1 / frame_rate;
+            if (!select_obj.checked)
+                if (Video_Obj.currentTime > 0)
+                    Video_Obj.currentTime -= 1 / frame_rate;
+            if (video_list != null && select_obj.checked) {
+                video_list.forEach(video => {
+                    if (video.select_checked()) {
+                        video.before_frame();
+                    }
+                });
+            }
         }
         this_div.appendChild(before_frame_btn);
         //下一帧按钮
@@ -369,9 +452,16 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         }
         //下一帧按钮鼠标单击
         next_frame_btn.onclick = function (e) {
-            
-            if (Video_Obj.currentTime < Video_Obj.duration)
-                Video_Obj.currentTime += 1 / frame_rate;
+            if (!select_obj.checked)
+                if (Video_Obj.currentTime < Video_Obj.duration)
+                    Video_Obj.currentTime += 1 / frame_rate;
+            if (video_list != null && select_obj.checked) {
+                video_list.forEach(video => {
+                    if (video.select_checked()) {
+                        video.next_frame();
+                    }
+                });
+            }
         }
         this_div.appendChild(next_frame_btn);
     }
@@ -380,7 +470,7 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
      */
     this.play = function () {
         var video_play_status = !Video_Obj.paused;
-        if (!video_play_status) {           
+        if (!video_play_status) {
             Video_Obj.play();
             pause_button_Line.style.display = "";
             pause_button_triangle.style.display = "none";
@@ -403,14 +493,14 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
      */
     this.next_frame = function () {
         if (Video_Obj.currentTime < Video_Obj.duration)
-        Video_Obj.currentTime += 1 / frame_rate;
+            Video_Obj.currentTime += 1 / frame_rate;
     }
     /**
      * 公共的上一帧
      */
     this.before_frame = function () {
         if (Video_Obj.currentTime > 0)
-        Video_Obj.currentTime -= 1 / frame_rate;
+            Video_Obj.currentTime -= 1 / frame_rate;
     }
     /**
      * 公共的加速
@@ -441,29 +531,32 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
      * 公共的下载
      */
     this.download = function () {
-       pri_download();
+        pri_download();
     }
     /**
      * 设置当前视频播放的百分比
      * @param {*} percent 百分比（浮点数）
      */
-    this.SetVideoCurrentTime=function(percent){
-        Video_Obj.currentTime=Video_Obj.duration*percent;
+    this.SetVideoCurrentTime = function (percent) {
+        Video_Obj.currentTime = Video_Obj.duration * percent;
     }
     /**
      * 公共的截图
      */
-    this.Cut_Pic=function(){
+    this.Cut_Pic = function () {
         pri_cut_pic();
     }
     /**
      * 获取复选框状态
      */
-    this.select_checked = select_obj.checked;
+    this.select_checked = function () {
+        // console.log(select_obj.checked);
+        return select_obj.checked;
+    }
     /**
      * 私有的截图
      */
-    var pri_cut_pic=function(){
+    var pri_cut_pic = function () {
         canvas.width = Video_Obj.videoWidth;
         canvas.height = Video_Obj.videoHeight;
         canvas.getContext('2d').drawImage(Video_Obj, 0, 0, canvas.width, canvas.height);
@@ -476,15 +569,15 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
     /**
      * 私有的下载
      */
-    var pri_download=function(){
-         // 生成一个a元素
-         var a = document.createElement('a')
-         // 将a的download属性设置为我们想要下载的图片名称
-         a.download = video_name || 'video'
-         // 将生成的URL设置为a.href属性
-         a.href = src;
-         // 触发a的单击事件
-         a.click();
+    var pri_download = function () {
+        // 生成一个a元素
+        var a = document.createElement('a')
+        // 将a的download属性设置为我们想要下载的图片名称
+        a.download = video_name || 'video'
+        // 将生成的URL设置为a.href属性
+        a.href = src;
+        // 触发a的单击事件
+        a.click();
     }
     //加载播放器
     this.load = function () {
@@ -539,8 +632,6 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
     }
 
 }
-
-
 
 /**
  * 一个图片对象
