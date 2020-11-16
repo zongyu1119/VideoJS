@@ -1,6 +1,6 @@
 /**
  * 一个视频播放器对象
- * @param {String} src 链接
+ * @param {String} src 链接-必须是视频的完整引用地址，如http://127.0.0.1:8888/File/VID/test.mp4
  * @param {DoubleRange} width 宽度
  * @param {DoubleRange} height 高度
  * @param {Element} father_div 父DIV
@@ -24,7 +24,7 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
     var pause_button_Line = document.createElement("div");//暂停按钮内部2
     var range_div = document.createElement("div");//滑动条区域
     var control_range = document.createElement("div");//滑动条/进度条
-    var control_range_child = document.createElement("div");//滑动条子元素
+    var control_range_child = document.createElement("div");//滑动条-子元素
     var speed_up_btn = document.createElement("div");//播放加速
     var speed_down_btn = document.createElement("div");//播放减速
     var speed_div = document.createElement("div");//视频播放速度显示
@@ -108,8 +108,8 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
          */
         control_range.onmousedown = function (e) {
             //进度条按下按钮 
-            if (!select_obj.checked) {
-                var length = e.offsetX;
+            var length = e.offsetX;
+            if (!select_obj.checked) {                
                 var percent = video_time / this.offsetWidth;
                 Video_Obj.currentTime = length * percent;
             }
@@ -329,9 +329,10 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         }
         //鼠标点击下载按钮
         download_btn.onclick = function (e) {
-            isFinite(!select_obj.checked)
-            pri_download();
-            if (video_list != null && select_obj.checked) {
+            if (!select_obj.checked) {
+                pri_download();
+            }
+            else if (video_list != null && select_obj.checked) {
                 video_list.forEach(video => {
                     if (video.select_checked()) {
                         video.download();
@@ -357,9 +358,11 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         frame_text.style.cssText = "color:#FFFFFF;background-color:#555555;border-radius:5px;font-size:8px;float:left;position:relative;bottom:" + 60 + "px;left:10px;";
         this_div.appendChild(frame_text);
         //上一帧按钮
-        before_frame_btn.style.cssText = "width:80px;position:relative;bottom:" + "" + "50%;margin-top:-60px;left:0px;margin-left;0;display:none;";
+        before_frame_btn.style.cssText = "width:80px;position:relative;bottom:" + "" + "50%;margin-top:-60px;left:0px;margin-left;0;display:none;";        
+     
         var before_frame_btn_top = document.createElement("div");
-        before_frame_btn_top.style.cssText = "width:60px;height:0px;border:5px solid #FFFFFF;border-radius:2px;box-sizing: content-box;";
+        before_frame_btn_top.style.cssText = "width:60px;height:0px;border:10px solid #FFFFFF;border-radius:2px;box-sizing: content-box;";
+        before_frame_btn_top.style.borderBottom="none";
         var before_frame_btn_top_rotate = -60;
         before_frame_btn_top.style.webkitTransform = "rotate(" + before_frame_btn_top_rotate + "deg)"
         before_frame_btn_top.style.MozTransform = "rotate(" + before_frame_btn_top_rotate + "deg)"
@@ -368,7 +371,8 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         before_frame_btn_top.style.transform = "rotate(" + before_frame_btn_top_rotate + "deg)";
         before_frame_btn.appendChild(before_frame_btn_top);
         var before_frame_btn_bot = document.createElement("div");
-        before_frame_btn_bot.style.cssText = "width:60px;height:0px;border:5px solid #FFFFFF;border-radius:2px;box-sizing: content-box;position:relative;top:45px;";
+        before_frame_btn_bot.style.cssText = "width:60px;height:0px;border:10px solid #FFFFFF;border-radius:2px;box-sizing: content-box;position:relative;top:55px;";        
+        before_frame_btn_bot.style.borderBottom="none";
         var before_frame_btn_bot_rotate = 60;
         before_frame_btn_bot.style.webkitTransform = "rotate(" + before_frame_btn_bot_rotate + "deg)"
         before_frame_btn_bot.style.MozTransform = "rotate(" + before_frame_btn_bot_rotate + "deg)"
@@ -400,7 +404,7 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         before_frame_btn.onclick = function (e) {
             if (!select_obj.checked)
                 if (Video_Obj.currentTime > 0)
-                    Video_Obj.currentTime -= 1 / frame_rate;
+                    Video_Obj.currentTime -= (1 / frame_rate);
             if (video_list != null && select_obj.checked) {
                 video_list.forEach(video => {
                     if (video.select_checked()) {
@@ -413,7 +417,7 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         //下一帧按钮
         next_frame_btn.style.cssText = "width:80px;position:relative;bottom:" + "" + "50%;margin-top:-60px;right:-70px;margin-right;0;display:none;float:right;";
         var next_frame_btn_top = document.createElement("div");
-        next_frame_btn_top.style.cssText = "width:60px;height:0px;border:5px solid #FFFFFF;border-radius:2px;box-sizing: content-box;";
+        next_frame_btn_top.style.cssText = "width:60px;height:0px;border:10px solid #FFFFFF;border-radius:2px;box-sizing: content-box;border-bottom:none;";
         var next_frame_btn_top_rotate = 60;
         next_frame_btn_top.style.webkitTransform = "rotate(" + next_frame_btn_top_rotate + "deg)"
         next_frame_btn_top.style.MozTransform = "rotate(" + next_frame_btn_top_rotate + "deg)"
@@ -422,7 +426,7 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         next_frame_btn_top.style.transform = "rotate(" + next_frame_btn_top_rotate + "deg)";
         next_frame_btn.appendChild(next_frame_btn_top);
         var next_frame_btn_bot = document.createElement("div");
-        next_frame_btn_bot.style.cssText = "width:60px;height:0px;border:5px solid #FFFFFF;border-radius:2px;box-sizing: content-box;position:relative;top:45px;";
+        next_frame_btn_bot.style.cssText = "width:60px;height:0px;border:10px solid #FFFFFF;border-radius:2px;box-sizing: content-box;position:relative;top:55px;border-bottom:none;";
         var next_frame_btn_bot_rotate = -60;
         next_frame_btn_bot.style.webkitTransform = "rotate(" + next_frame_btn_bot_rotate + "deg)"
         next_frame_btn_bot.style.MozTransform = "rotate(" + next_frame_btn_bot_rotate + "deg)"
@@ -454,7 +458,7 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         next_frame_btn.onclick = function (e) {
             if (!select_obj.checked)
                 if (Video_Obj.currentTime < Video_Obj.duration)
-                    Video_Obj.currentTime += 1 / frame_rate;
+                    Video_Obj.currentTime += (1 / frame_rate);
             if (video_list != null && select_obj.checked) {
                 video_list.forEach(video => {
                     if (video.select_checked()) {
@@ -477,6 +481,21 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
         }
     }
     /**
+     * 从某个时间点播放
+     * @param {*} time_off_set 时间点
+     */
+    this.play_time=function(time_off_set){
+        var video_play_status = !Video_Obj.paused;
+        if (!video_play_status) {
+            Video_Obj.currentTime=time_off_set;
+            Video_Obj.play();
+            pause_button_Line.style.display = "";
+            pause_button_triangle.style.display = "none";
+        }else{
+            Video_Obj.currentTime=time_off_set;
+        }
+    }
+    /**
      * 公共的暂停
      */
     this.pause = function () {
@@ -493,14 +512,14 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
      */
     this.next_frame = function () {
         if (Video_Obj.currentTime < Video_Obj.duration)
-            Video_Obj.currentTime += 1 / frame_rate;
+            Video_Obj.currentTime += (1 / frame_rate);
     }
     /**
      * 公共的上一帧
      */
     this.before_frame = function () {
         if (Video_Obj.currentTime > 0)
-            Video_Obj.currentTime -= 1 / frame_rate;
+            Video_Obj.currentTime -= (1 / frame_rate);
     }
     /**
      * 公共的加速
@@ -572,7 +591,7 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
     var pri_download = function () {
         // 生成一个a元素
         var a = document.createElement('a')
-        // 将a的download属性设置为我们想要下载的图片名称
+        // 将a的download属性设置为我们想要下载的视频名称
         a.download = video_name || 'video'
         // 将生成的URL设置为a.href属性
         a.href = src;
@@ -599,8 +618,8 @@ function Video(src, width, height, father_div, screenshot_callback, video_name =
             var videos = father_div.children;
             if (size == "min") {
                 size = "max";
-                width = father_div.clientWidth - 10;
-                height = father_div.clientHeight - 10;
+                width = father_div.clientWidth - 20;
+                height = father_div.clientHeight - 20;
                 if (videos != null && videos.length > 0)
                     for (var i = 0; i < videos.length; i++) {
                         if (videos[i] != this_div) {

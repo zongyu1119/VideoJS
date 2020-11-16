@@ -1,0 +1,27 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+<meta charset="utf-8"> 
+<title>W3Cschool教程(w3cschool.cn)</title> 
+</head> 
+<body> 
+
+<video id="myVideo" width="320" height="240" controls>
+	<source src="/test.mp4" type="video/mp4">
+  
+  	您的浏览器不支持 video 标签。
+</video><br>
+<button onclick="getCurTime()" type="button">获取当前时间点</button>
+<button onclick="setCurTime()" type="button">设置时间位置为5秒</button>
+<script>
+var x = document.getElementById("myVideo");
+function getCurTime(){ 
+	alert(x.currentTime);
+} 
+function setCurTime(){ 
+	x.currentTime = 5;
+} 
+</script> 
+
+</body> 
+</html>
